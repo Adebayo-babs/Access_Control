@@ -18,10 +18,22 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            //noinspection ChromeOsAbiSupport
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
+        }
     }
 
     buildTypes {
         release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -41,6 +53,56 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+            pickFirsts += listOf(
+                "lib/armeabi-v7a/libNCore.so",
+                "lib/arm64-v8a/libNCore.so",
+                "lib/x86/libNCore.so",
+                "lib/x86_64/libNCore.so",
+                "**/libjnidispatch.so"
+            )
+        }
+
+        resources {
+            excludes += listOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/ASL2.0",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "META-INF/*.kotlin_module",
+                "member-search-index.zip",
+                "jquery-ui.overrides.css",
+                "jquery/jquery-ui.min.css",
+                "index-all.html",
+                "**", "META-INF/**", "element-list", "legal/ASSEMBLY_EXCEPTION", "**/*.html", "**/*.png", "**/*.js", "**/*.css", "**/*.md"
+            )
+            pickFirsts += listOf(
+                "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            )
+
+            jniLibs {
+                useLegacyPackaging = true
+                pickFirsts += listOf(
+                    "**/libjnidispatch.so",
+                    "lib/**/libNCore.so"
+                )
+            }
+        }
+    }
+
+    packagingOptions {
+        resources {
+            excludes += "member-search-index.zip"
+        }
+    }
 }
 
 dependencies {
@@ -52,10 +114,17 @@ dependencies {
     //Lottie
     implementation(libs.lottie.compose)
 
+    // JNA dependency
+    implementation("net.java.dev.jna:jna:5.13.0@aar")
+
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.play.services.nearby)
     implementation(libs.play.services.recaptcha)
+    implementation(libs.camera.view)
+    implementation(libs.camera.lifecycle)
+    implementation("androidx.camera:camera-core:1.5.0")
+    implementation("androidx.camera:camera-camera2:1.5.0")
     coreLibraryDesugaring (libs.desugar.jdk.libs)
 
     implementation("androidx.core:core-ktx:1.13.1")

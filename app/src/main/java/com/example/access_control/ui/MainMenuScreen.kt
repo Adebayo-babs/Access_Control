@@ -38,20 +38,11 @@ import com.example.access_control.viewModel.CardReaderViewModel
 
 @Composable
 fun MainMenuScreen(
-    isLoading: Boolean = false,
-    viewModel: CardReaderViewModel
+    viewModel: CardReaderViewModel,
+    onNavigateToFaceCapture: () -> Unit
 ) {
 
     val dialogState by viewModel.dialogState.collectAsState()
-
-    val context = LocalContext.current
-
-
-//    LaunchedEffect(Unit) {
-//        val commonUtil = CommonUtil(context)
-//        commonUtil.setRelayPower(CommonConstants.RelayType.RELAY_1, 0)
-//        Log.d("MainMenuScreen", "Relay turned OFF on initialization")
-//    }
 
 
     Box(

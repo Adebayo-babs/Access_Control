@@ -13,6 +13,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,13 +21,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
+import com.example.access_control.ui.FaceCaptureScreen
 import com.example.access_control.ui.MainMenuScreen
 import com.example.access_control.ui.SplashScreen
 import com.example.access_control.ui.theme.Access_ControlTheme
 import com.example.access_control.viewModel.CardReaderViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -39,12 +38,14 @@ class MainActivity : ComponentActivity() {
     private var intentFiltersArray: Array<IntentFilter>? = null
     private var techListsArray: Array<Array<String>>? = null
 
-    private lateinit var viewModel: CardReaderViewModel
+    private val viewModel: CardReaderViewModel by viewModels()
 
     // Navigation States
     private enum class Screen {
         SPLASH,
-        MAIN_MENU
+        MAIN_MENU,
+        FACE_CAPTURE
+//        FINGERPRINT_CAPTURE
     }
 
     private var toneGenerator: ToneGenerator? = null
@@ -56,8 +57,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel = CardReaderViewModel()
         toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 1000)
+
+        Log.d(TAG, "Checking licenses...")
+        Log.d(TAG, "Face Licenses activated: ${MatchApplication.areFaceLicensesActivated}")
+        Log.d(TAG, "Finger Licenses activated: ${MatchApplication.areFingerLicensesActivated}")
+
 
         setupNFC()
 
@@ -78,8 +83,31 @@ class MainActivity : ComponentActivity() {
                         }
 
                         Screen.MAIN_MENU -> {
-                            MainMenuScreen(viewModel = viewModel)
+                            MainMenuScreen(
+                                viewModel = viewModel,
+                                onNavigateToFaceCapture = {
+                                    currentScreen = Screen.FACE_CAPTURE
+                                }
+                            )
                         }
+
+                        Screen.FACE_CAPTURE -> {
+                            FaceCaptureScreen(
+                                    viewModel = viewModel,
+                                    onBack = {
+                                        currentScreen = Screen.MAIN_MENU
+                                    }
+                                )
+                            }
+
+//                        Screen.FINGERPRINT_CAPTURE -> {
+//                            FingerCaptureScreen(
+//                                onBack = {
+//                                    currentScreen = Screen.MAIN_MENU
+//                                },
+//                                onSwitchToFace = Screen.FACE_CAPTURE
+//                            )
+//                        }
                     }
                 }
             }
@@ -141,14 +169,17 @@ class MainActivity : ComponentActivity() {
 
         playSuccessSound()
 
+        // Navigate to face capture screen
+        currentScreen = Screen.FACE_CAPTURE
+
         // Show dialog immediately
-        viewModel.showCardTappedDialog()
+//        viewModel.showCardTappedDialog()
 
         // Hide dialog after 2 seconds
-        lifecycleScope.launch {
-            delay(2000)
-            viewModel.hideDialog()
-        }
+//        lifecycleScope.launch {
+//            delay(2000)
+//            viewModel.hideDialog()
+//        }
 
     }
 
