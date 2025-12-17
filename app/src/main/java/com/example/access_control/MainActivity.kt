@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.access_control.ui.FaceCaptureScreen
+import com.example.access_control.ui.FingerCaptureScreen
 import com.example.access_control.ui.MainMenuScreen
 import com.example.access_control.ui.SplashScreen
 import com.example.access_control.ui.theme.Access_ControlTheme
@@ -44,8 +45,8 @@ class MainActivity : ComponentActivity() {
     private enum class Screen {
         SPLASH,
         MAIN_MENU,
-        FACE_CAPTURE
-//        FINGERPRINT_CAPTURE
+        FACE_CAPTURE,
+        FINGERPRINT_CAPTURE
     }
 
     private var toneGenerator: ToneGenerator? = null
@@ -100,18 +101,23 @@ class MainActivity : ComponentActivity() {
                                 onPlayFaceDetectedSound = {
                                     val toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 1000)
                                     toneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 1000)
+                                },
+                                onSwitchToFingerprint = {
+                                    currentScreen = Screen.FINGERPRINT_CAPTURE
                                 }
                                 )
                             }
 
-//                        Screen.FINGERPRINT_CAPTURE -> {
-//                            FingerCaptureScreen(
-//                                onBack = {
-//                                    currentScreen = Screen.MAIN_MENU
-//                                },
-//                                onSwitchToFace = Screen.FACE_CAPTURE
-//                            )
-//                        }
+                        Screen.FINGERPRINT_CAPTURE -> {
+                            FingerCaptureScreen(
+                                onBack = {
+                                    currentScreen = Screen.MAIN_MENU
+                                },
+                                onSwitchToFace = {
+                                    currentScreen = Screen.FACE_CAPTURE
+                                }
+                            )
+                        }
                     }
                 }
             }

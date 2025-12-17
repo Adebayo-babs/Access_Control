@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -61,6 +62,7 @@ import kotlinx.coroutines.delay
 fun FaceCaptureScreen(
     onBack: () -> Unit,
     viewModel: CardReaderViewModel,
+    onSwitchToFingerprint: () -> Unit,
     onPlayFaceDetectedSound: () -> Unit
 ) {
 
@@ -145,17 +147,26 @@ fun FaceCaptureScreen(
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        // Switch to Fingerprint button
+                        FloatingActionButton(
+                            onClick = { onSwitchToFingerprint() },
+                            containerColor = Color(0xFF424242),
+                            contentColor = Color.White,
+                            modifier = Modifier.size(48.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_fingerprint_24),
+                                contentDescription = "Switch to fingerprint",
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                         // Camera switch button
                         FloatingActionButton(
                             onClick = {
                                 Log.d("FaceCaptureScreen", "CAMERA SWITCH BUTTON CLICKED")
                                 viewModel.toggleCameraPreview()
 
-//                                Toast.makeText(
-//                                    context,
-//                                    if (viewModel.useNeurotecCamera) "Switched to Colored" else "Switched to Grayscale",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
+
                             },
                             containerColor = Color(0xFF424242),
                             contentColor = Color.White,
