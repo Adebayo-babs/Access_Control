@@ -96,7 +96,11 @@ class MainActivity : ComponentActivity() {
                                     viewModel = viewModel,
                                     onBack = {
                                         currentScreen = Screen.MAIN_MENU
-                                    }
+                                    },
+                                onPlayFaceDetectedSound = {
+                                    val toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 1000)
+                                    toneGen.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 1000)
+                                }
                                 )
                             }
 

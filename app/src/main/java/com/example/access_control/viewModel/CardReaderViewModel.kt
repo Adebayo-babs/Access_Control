@@ -81,6 +81,9 @@ class CardReaderViewModel(application: Application) : AndroidViewModel(applicati
     var useNeurotecCamera by mutableStateOf(true)
         private set
 
+    // Callback property for sound
+    var onFaceDetectedSound: (() -> Unit)? = null
+
     private val cameras = mutableListOf<NCamera>()
     private var activeCameraIndex = 0
 
@@ -201,6 +204,7 @@ class CardReaderViewModel(application: Application) : AndroidViewModel(applicati
                         val bitmap = faceImage?.let { convertNImageToBitmap(it) }
 
                         main.post {
+                            onFaceDetectedSound?.invoke()
                             status = "Face captured successfully!"
                             detectionFeedback = FaceDetectionFeedback(
                                 lightingStatus = LightingStatus.GOOD,
