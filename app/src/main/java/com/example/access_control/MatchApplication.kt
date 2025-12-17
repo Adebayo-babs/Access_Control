@@ -51,16 +51,16 @@ class MatchApplication : Application() {
         }
 
         // Activate finger licenses
-        try {
-            areFingerLicensesActivated = NeurotecLicenseHelper.obtainFingerLicenses(this@MatchApplication)
-            if (areFingerLicensesActivated) {
-                Log.d(TAG, " Fingerprint licenses activated successfully")
-            } else {
-                Log.d(TAG, "✓ Fingerprint licenses activated failed")
-            }
-        } catch (e: Exception) {
-            Log.d(TAG, "Error activating Fingerprint licenses")
-        }
+//        try {
+//            areFingerLicensesActivated = NeurotecLicenseHelper.obtainFingerLicenses(this@MatchApplication)
+//            if (areFingerLicensesActivated) {
+//                Log.d(TAG, " Fingerprint licenses activated successfully")
+//            } else {
+//                Log.d(TAG, "✓ Fingerprint licenses activated failed")
+//            }
+//        } catch (e: Exception) {
+//            Log.d(TAG, "Error activating Fingerprint licenses")
+//        }
     }
 
     override fun onTerminate() {

@@ -73,7 +73,11 @@ fun FaceCaptureScreen(
 
     // Handle dialog auto-dismiss and navigation
     LaunchedEffect(dialogState.showDialog) {
-        if (dialogState.showDialog && dialogState.message.contains("Face Detected", ignoreCase = true)) {
+        if (dialogState.showDialog && dialogState.message.contains(
+                "Face Detected",
+                ignoreCase = true
+            )
+        ) {
             delay(5000) // Show for 5 seconds
             viewModel.hideDialog()
             viewModel.reset()
@@ -139,11 +143,11 @@ fun FaceCaptureScreen(
                                 Log.d("FaceCaptureScreen", "CAMERA SWITCH BUTTON CLICKED")
                                 viewModel.toggleCameraPreview()
 
-                                Toast.makeText(
-                                    context,
-                                    if (viewModel.useNeurotecCamera) "Switched to Colored" else "Switched to Grayscale",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+//                                Toast.makeText(
+//                                    context,
+//                                    if (viewModel.useNeurotecCamera) "Switched to Colored" else "Switched to Grayscale",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
                             },
                             containerColor = Color(0xFF424242),
                             contentColor = Color.White,
@@ -169,10 +173,16 @@ fun FaceCaptureScreen(
                         containerColor = when {
                             status.contains("error", ignoreCase = true) -> Color(0xFFD32F2F)
                             status.contains("success", ignoreCase = true) ||
-                                    status.contains("captured", ignoreCase = true) -> Color(0xFF4CAF50)
+                                    status.contains("captured", ignoreCase = true) -> Color(
+                                0xFF4CAF50
+                            )
+
                             status.contains("matching", ignoreCase = true) ||
                                     status.contains("processing", ignoreCase = true) ||
-                                    status.contains("detecting", ignoreCase = true) -> Color(0xFF2196F3)
+                                    status.contains("detecting", ignoreCase = true) -> Color(
+                                0xFF2196F3
+                            )
+
                             else -> Color(0xFF2C2C2C)
                         }
                     ),

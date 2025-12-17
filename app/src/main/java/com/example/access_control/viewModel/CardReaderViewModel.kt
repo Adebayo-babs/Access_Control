@@ -81,6 +81,9 @@ class CardReaderViewModel(application: Application) : AndroidViewModel(applicati
     var useNeurotecCamera by mutableStateOf(true)
         private set
 
+    private val cameras = mutableListOf<NCamera>()
+    private var activeCameraIndex = 0
+
     private var isInitialized = false
     private var captureInProgress = false
 
@@ -113,8 +116,6 @@ class CardReaderViewModel(application: Application) : AndroidViewModel(applicati
                 facesQualityThreshold = 50
                 facesConfidenceThreshold = 1
 
-                isUseDeviceManager = true
-                deviceManager.deviceTypes = EnumSet.of(NDeviceType.CAMERA)
                 // Disable features that needs the missing models
                 setProperty("Faces.DetectAllFeaturePoints", "false")
                 setProperty("Faces.RecognizeExpression", "false")
@@ -122,20 +123,31 @@ class CardReaderViewModel(application: Application) : AndroidViewModel(applicati
                 initialize()
             }
 
-            val cameras = biometricClient?.deviceManager?.devices
-            if (cameras?.isNotEmpty() == true) {
-                val camera = cameras[0] as NCamera
-                biometricClient?.faceCaptureDevice = camera
+            val cameras = biometricClient?.deviceManager?.devices ?: emptyList()
+            this.cameras.clear()
 
-                isInitialized = true
+            cameras.forEach { device ->
+                if (device is NCamera) {
+                    this.cameras.add(device)
+                    Log.d("NeurotecCamera", "Detected camera: ${device.displayName}")
+                }
 
-                main.postDelayed({
-                    status = "Ready. Position your face..."
-                    startAutomaticCapture()
-                }, 300)
-            } else {
-                status = "No camera found"
             }
+
+            if (this.cameras.isEmpty()) {
+                main.post { status = "No camera found"}
+                return
+            }
+
+            activeCameraIndex = 0
+            biometricClient?.faceCaptureDevice = this.cameras[activeCameraIndex]
+
+            isInitialized = true
+
+            main.postDelayed({
+                status = "Ready. Position your face..."
+                startAutomaticCapture()
+            }, 300)
         } catch (e: Exception) {
             Log.e("CardReaderViewModel", "Camera initialization error", e)
             main.post { status = "Camera initialization error: ${e.message}" }
@@ -261,15 +273,32 @@ class CardReaderViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+
+    fun toggleCameraPreview() {
+        if (cameras.size < 2) {
+            status = "Only one camera available"
+            return
+        }
+        stopCapture()
+        activeCameraIndex = (activeCameraIndex + 1) % cameras.size
+        biometricClient?.faceCaptureDevice = cameras[activeCameraIndex]
+        status = "Switched to ${cameras[activeCameraIndex].displayName}"
+        startAutomaticCapture()
+    }
+
     fun stopCapture() {
         captureInProgress = false
         isCapturing = false
-        currentSubject = null
-    }
 
-    fun toggleCameraPreview() {
-        useNeurotecCamera = !useNeurotecCamera
-        Log.d("CardReaderViewModel", "Camera preview toggled to: ${if (useNeurotecCamera) "Neurotec (Colored)" else "CameraX (Grayscale)"}")
+        // Cancel any pending capture operations
+        try {
+            currentSubject?.let { subject ->
+                subject.faces.clear()
+            }
+            currentSubject = null
+        } catch (e: Exception) {
+            Log.e("CardReaderViewModel", "Error clearing subject", e)
+        }
     }
 
     private fun showFaceDetectedDialog(faceBitmap: Bitmap?) {

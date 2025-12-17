@@ -79,35 +79,35 @@ object NeurotecLicenseHelper {
 
 
     // Obtain finger licenses
-    fun obtainFingerLicenses(context: Context): Boolean {
-        return try {
-            Log.d(TAG, "Starting Fingerprint License Activation")
-
-            var fingerExtraction = NLicense.isComponentActivated(LICENSE_FINGER_EXTRACTION)
-            var fingerMatching = NLicense.isComponentActivated(LICENSE_FINGER_MATCHING)
-
-            if (!fingerExtraction || !fingerMatching) {
-                loadLicenseFiles(context)
-
-                fingerLicenseComponents.forEach { component ->
-                    try {
-                        val obtained = NLicense.obtainComponents("/local", "5000", component)
-                        Log.d(TAG, "$component activation = $obtained")
-                    } catch (e: Exception) {
-                        Log.d(TAG, "Error activating $component", e)
-                    }
-                }
-            }
-            val result = NLicense.isComponentActivated(LICENSE_FINGER_EXTRACTION) &&
-                    NLicense.isComponentActivated(LICENSE_FINGER_MATCHING)
-
-            Log.d(TAG, "Fingerprint licenses activation result: $result")
-            result
-        } catch (e: Exception) {
-            Log.d(TAG, "Fingerprint licenses activation failed", e)
-            false
-        }
-    }
+//    fun obtainFingerLicenses(context: Context): Boolean {
+//        return try {
+//            Log.d(TAG, "Starting Fingerprint License Activation")
+//
+//            var fingerExtraction = NLicense.isComponentActivated(LICENSE_FINGER_EXTRACTION)
+//            var fingerMatching = NLicense.isComponentActivated(LICENSE_FINGER_MATCHING)
+//
+//            if (!fingerExtraction || !fingerMatching) {
+//                loadLicenseFiles(context)
+//
+//                fingerLicenseComponents.forEach { component ->
+//                    try {
+//                        val obtained = NLicense.obtainComponents("/local", "5000", component)
+//                        Log.d(TAG, "$component activation = $obtained")
+//                    } catch (e: Exception) {
+//                        Log.d(TAG, "Error activating $component", e)
+//                    }
+//                }
+//            }
+//            val result = NLicense.isComponentActivated(LICENSE_FINGER_EXTRACTION) &&
+//                    NLicense.isComponentActivated(LICENSE_FINGER_MATCHING)
+//
+//            Log.d(TAG, "Fingerprint licenses activation result: $result")
+//            result
+//        } catch (e: Exception) {
+//            Log.d(TAG, "Fingerprint licenses activation failed", e)
+//            false
+//        }
+//    }
 
     private fun loadLicenseFiles(context: Context) {
         val licenseDir = File(context.filesDir, "Licenses")
@@ -130,7 +130,7 @@ object NeurotecLicenseHelper {
 
     fun release() {
         try {
-            val allComponents = (faceLicenseComponents + fingerLicenseComponents).joinToString (",")
+            val allComponents = (faceLicenseComponents).joinToString (",")
             NLicense.releaseComponents(allComponents)
             Log.d(TAG, "All licenses released")
         } catch (e: Exception) {
